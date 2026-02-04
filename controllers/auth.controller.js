@@ -8,6 +8,13 @@ export const register = async (req, res) => {
     if (!email || !password || !role)
       return res.status(400).json({ message: "All fields are required" });
 
+    // Regex to validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ message: "User already exists" });
@@ -15,8 +22,8 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({ email, password: hashedPassword, role });
     res.status(201).json({ message: "User registered successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -42,7 +49,7 @@ export const login = async (req, res) => {
     );
 
     res.status(200).json({ message: "Login successful", token });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

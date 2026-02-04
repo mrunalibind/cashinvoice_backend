@@ -2,7 +2,13 @@ import Student from "../models/student.model.js";
 
 export const createStudent = async (req, res) => {
   try {
-    
+    // Regex to validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(req.body.email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
     const existingStudent = await Student.findOne({ email: req.body.email });
     if (existingStudent) {
       return res.status(400).json({ message: "Email already exists" });
